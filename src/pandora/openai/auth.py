@@ -46,6 +46,9 @@ class Auth0:
             raise Exception('invalid email or password.')
 
         return self.__part_one() if login_local else self.get_access_token_proxy()
+    
+    def get_session_token(self):
+        return self.session_token
 
     def get_refresh_token(self):
         return self.refresh_token
@@ -194,6 +197,9 @@ class Auth0:
             json = resp.json()
             if 'access_token' not in json:
                 raise Exception('Get access token failed, maybe you need a proxy.')
+            
+            if 'session_token' in json:
+                self.session_token = json['session_token']
 
             if 'refresh_token' in json:
                 self.refresh_token = json['refresh_token']
