@@ -46,7 +46,7 @@ class Auth0:
             raise Exception('invalid email or password.')
 
         return self.__part_one() if login_local else self.get_access_token_proxy()
-    
+
     def get_session_token(self):
         return self.session_token
 
@@ -197,7 +197,7 @@ class Auth0:
             json = resp.json()
             if 'access_token' not in json:
                 raise Exception('Get access token failed, maybe you need a proxy.')
-            
+
             if 'session_token' in json:
                 self.session_token = json['session_token']
 
@@ -247,5 +247,23 @@ class Auth0:
             'mfa_code': self.mfa,
         }
         resp = self.session.post(url=url, headers=headers, data=data, allow_redirects=False, **self.req_kwargs)
+
+        return self.__parse_access_token(resp)
+
+    def get_access_token_by_session_token(self, session_token: str) -> str:
+        url = "{}/auth/session".format(config.chatgpt.auth_base_url)
+        headers = {
+            "User-Agent": self.user_agent,
+        }
+        data = {
+            "session_token": session_token,
+        }
+        resp = self.session.post(
+            url=url,
+            headers=headers,
+            data=data,
+            allow_redirects=False,
+            **self.req_kwargs
+        )
 
         return self.__parse_access_token(resp)
